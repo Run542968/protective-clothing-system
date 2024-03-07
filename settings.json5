@@ -51,7 +51,7 @@
             "立（左掌心）"
         ],
         "HW_WINDOW_SIZE": 10,
-        "HW_ACTIVATE_THRES": 0.7
+        "HW_ACTIVATE_THRES": 0.5
     },
     {
         "SCENARIO": 1,
@@ -69,26 +69,26 @@
             20
         ],
         "ACTIVATE_THRES": [
-            0.7,
-            0.7,
-            0.7,
-            0.7,
-            0.7,
-            0.7,
-            0.7,
-            0.7,
+            0.3,
+            0.3,
+            0.3,
+            0.4,
             0.5,
-            0.7,
-            0.7
+            0.5,
+            0.3,
+            0.5,
+            0.5,
+            0.5,
+            0.5
         ],
         "MODEL_POSITIVE_THRES": [
+            0.1,
+            0.3,
             0.5,
             0.5,
             0.5,
             0.5,
-            0.5,
-            0.5,
-            0.5,
+            0.4,
             0.5,
             0.5,
             0.5,
@@ -176,19 +176,19 @@
             90
         ],
         "ACTIVATE_THRES": [
-            0.7,
-            0.7,
-            0.7,
-            0.7,
-            0.7
-        ],
-        "MODEL_POSITIVE_THRES_FOR_YOLO": 0.3,
-        "MODEL_POSITIVE_THRES": [
             0.5,
             0.5,
             0.5,
             0.5,
             0.5
+        ],
+        "MODEL_POSITIVE_THRES_FOR_YOLO": 0.3,
+        "MODEL_POSITIVE_THRES": [
+            0.4,
+            0.4,
+            0.4,
+            0.4,
+            0.4
         ],
         "EXPECTED_TIME": [
             50,
@@ -243,13 +243,13 @@
             25
         ],
         "ACTIVATE_THRES": [
-            0.7,
-            0.7,
-            0.7,
-            0.7,
-            0.7,
-            0.7,
-            0.7
+            0.5,
+            0.5,
+            0.5,
+            0.5,
+            0.5,
+            0.5,
+            0.5
         ],
         "MODEL_POSITIVE_THRES_FOR_YOLO": 0.3,
         "MODEL_POSITIVE_THRES": [
