@@ -19,12 +19,17 @@ class HandWashAuxiliary:
         self.rec_font_style = ImageFont.truetype("./fonts/STZHONGS.TTF", 40, encoding="utf-8")
 
         self.zone_meta = {}
+        init_left, init_top = 40, 30
         # top, left, bottom, right，清空区域
         self.zone_meta['clear'] = (855, 570, 1460, 1080)
         # top, left, 项间距, 指示灯直径, 指示灯垂直偏移量
         self.zone_meta['lst'] = (855, 570, 48, 20, 15)
         # 检测结果指示区, top, left, h, w
         self.zone_meta['info'] = (545, 40, 150, int(720 * 0.7))
+        # heatmap区域
+        self.scale_rate = 0.7  # 摄像画面缩放比例（原宽高分辨率720x1280）
+        self.hm_scale_rate = 0.2  # 热力图区缩放比例（原宽高分辨率720x1280）
+        self.zone_meta['hm'] = (515 + init_top + int(1280 * self.scale_rate) - int(1280 * self.hm_scale_rate), init_left)
 
         self.background = (0x00, 0x33, 0x66)
         self.green = (63, 122, 102)
@@ -35,6 +40,13 @@ class HandWashAuxiliary:
         self.predict = 0
         self.update_light_index = 0
 
+        # 当前热力图
+        mat = np.zeros((conf.FRAME_HEIGHT, conf.FRAME_WIDTH)).astype(np.uint8)
+        # self.heatmap = cv2.applyColorMap(mat, cv2.COLORMAP_JET)
+        self.heatmap = mat
+
+
+
     def init_canvas(self, canvas):
         top, left, bottom, right = self.zone_meta['clear']
         cv2.rectangle(canvas, (left, top), (right, bottom), color=tuple(reversed(self.background)),
@@ -42,7 +54,7 @@ class HandWashAuxiliary:
         top, left, gap, diamater, offset_v = self.zone_meta['lst']
         return action_lst(canvas, conf.HWD_STEPS[1:], self.lst_font_style, top, left, gap, diamater, offset_v)
 
-    def draw(self, canvas):
+    def draw(self, canvas, cv2img):
         # 更新指示灯
         if self.update_light_index:
             light_idx = self.update_light_index - 1
@@ -57,9 +69,9 @@ class HandWashAuxiliary:
             canvas = self.set_light(canvas, light_idx, (0, 255, 0))
             self.update_light_index = 0
 
-        # top, left, h, w = (150, 840, 75, int(720*0.7))
-        # canvas = rectangle_text(canvas, top, left, h, w, 12, 20, '检测结果：{}'.format(conf.HWD_STEPS[self.predict]),
-        #                         self.purple, self.rec_font_style, None)
+        # jiarun add: heatmap应该一直都有
+        canvas = self.heatmap_zone(canvas, cv2img)
+
         return canvas
 
     def update_pred(self, predict):
@@ -77,6 +89,21 @@ class HandWashAuxiliary:
         top = top + idx * gap + offset_v
 
         return draw_light(canvas, top, left, diameter, color)
+
+
+    def heatmap_zone(self, canvas, cv2img):
+
+        top, left = self.zone_meta['hm']
+        color_heatmap = cv2.applyColorMap(self.heatmap, cv2.COLORMAP_JET)
+        # print(color_heatmap.shape)
+        hm = cv2.resize(color_heatmap, None, fx=self.hm_scale_rate, fy=self.hm_scale_rate)
+        cv2img = cv2.resize(cv2img, None, fx=self.hm_scale_rate, fy=self.hm_scale_rate)
+        # hm = cv2.resize(color_heatmap, dsize=(self.hm_w, self.hm_h))
+        # cv2img = cv2.resize(cv2img, dsize=(self.hm_w, self.hm_h))
+        add_img = cv2.addWeighted(cv2img, 0.5, hm, 0.5, 0)
+        h, w = cv2img.shape[0:2]
+        canvas[top: top + h, left: left + w, :] = add_img
+        return canvas
 
 
 class DrawerVertical:
@@ -167,6 +194,7 @@ class DrawerVertical:
         # if cv2.getWindowProperty(conf.WINDOW_NAME, cv2.WND_PROP_VISIBLE):
         #     cv2.destroyWindow(conf.WINDOW_NAME)
         print(f"对象drawer被删除")
+
     def init_draw(self):
         # 背景色
         self.canvas[:, :, 0] *= self.background[2]
@@ -278,7 +306,7 @@ class DrawerVertical:
 
         # self.canvas = self.handwash.draw(self.canvas)
         if conf.STEPS[self.cur_idx].split()[1] == "手卫生":
-            self.canvas = self.handwash.draw(self.canvas)
+            self.canvas = self.handwash.draw(self.canvas, cv2img)
         else:
             self.heatmap_zone(cv2img)
             self.update_flash()
@@ -461,11 +489,12 @@ class DrawerVertical:
             self.handwash = HandWashAuxiliary()
             self.canvas = self.handwash.init_canvas(self.canvas)
 
-    def update_heatmap(self, hm):
+    def update_heatmap(self, info):
         if conf.STEPS[self.cur_idx].split()[1] == "手卫生":
-            self.handwash.update_pred(hm)
-        elif type(hm) == np.ndarray:
-            self.heatmap = hm
+            self.handwash.update_pred(info['pred'])
+            self.handwash.heatmap = info['hm']
+        elif type(info['hm']) == np.ndarray:
+            self.heatmap = info['hm']
 
     def update_light(self, forward=True):
         # 更新指示灯

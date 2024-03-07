@@ -310,44 +310,51 @@ class C1GPU_TsmResnet50:
         img = cropper.crop(img, idx)
         b_img = self.transform(img).unsqueeze(0).to(self.device)            # add batch axis
         with torch.no_grad():
-            feat = nn.Sequential(*list(self.model.children())[0:-2])(b_img)
-            pooled = self.model.avgpool(feat).view(1, -1)
+            feat = nn.Sequential(*list(self.model.children())[0:-2])(b_img) # feat.shape=[1,2048,7,7]
+            pooled = self.model.avgpool(feat).view(1, -1) # jiarun: [1,2048]
+            h, w = img.size[1], img.size[0]
             if self.action_type == 'common':
                 score = torch.sigmoid(self.model.fc(pooled)).cpu()
-                predict = int(score > conf.MODEL_POSITIVE_THRES[idx])
-                h, w = img.size[1], img.size[0]
+                predict = int(score > conf.MODEL_POSITIVE_THRES[idx]) # jiarun: 当预测分数大于阈值的时候，才显示heatmap
                 if not predict:
                     heatmap = np.zeros((h, w)).astype(np.uint8)
                 else:
                     heatmap = self.get_heatmap(feat.cpu(), h, w)
                 heatmap = cropper.putback(heatmap, idx)
             elif self.action_type == 'handwash':
-                logit = self.model.fc(pooled).squeeze(0).cpu()
-                prob = torch.softmax(logit, dim=0)
-                score = float(torch.max(prob))
+                logit = self.model.fc(pooled).squeeze(0).cpu() # jiarun: [num_classes]
+                prob = torch.softmax(logit, dim=0) # jiarun: [num_classes]
+                score = float(torch.max(prob)) # jiarun: [1]
+
                 if score < conf.HW_MODEL_POSITIVE_THRES:
                     predict = 0
+                    heatmap = np.zeros((h, w)).astype(np.uint8)
                 else:
                     predict = torch.argmax(prob) + 1
-                heatmap = int(predict)
+                    heatmap = self.get_heatmap(feat.cpu(), h, w)
+                # heatmap = int(predict)
+                heatmap = cropper.putback(heatmap, idx)
+
             else:
                 raise NotImplementedError
 
         return {'score': score, 'pred': predict, 'hm': heatmap}
 
     def get_heatmap(self, feature_map, h, w):
-        feat = feature_map
+        feat = feature_map # jiarun: [1,2048,7,7]
+
         # score.backward()
         # grad = feat.grad
         # grad = F.adaptive_avg_pool2d(grad, (1, 1)).squeeze(0)
-        feat = feat.squeeze(0)
+        feat = feat.squeeze(0) # jiarun: [2028,7,7]
         # feat = feat * grad
-        feat = feat * self.model.fc.weight.unsqueeze(0).permute(2, 0, 1).cpu()
+        weight = self.model.fc.weight.unsqueeze(0).mean(1,keepdim=True) # jiarun add this line for adapting to handwash: [1,1,2048]
+        feat = feat * weight.permute(2, 0, 1).cpu() # fc.weight=[num_classes,2048]->[1,num_classes,2048]->[2048,1,num_classes]
 
-        heatmap = feat.detach().numpy()
-        heatmap = np.mean(heatmap, axis=0)
+        heatmap = feat.detach().numpy() # [2048,7,7]
+        heatmap = np.mean(heatmap, axis=0) # [7,7]
 
-        heatmap = np.maximum(heatmap, 0)
+        heatmap = np.maximum(heatmap, 0) #
         if np.max(heatmap) > 0:
             heatmap /= np.max(heatmap)
         heatmap = (cv2.resize(heatmap, (w, h)) * 255).astype(np.uint8)

@@ -7,7 +7,6 @@
         //若从文件输入，文件的路径
         "VIDEO_DIR": "examples/",
         "VIDEO_NAME": "内层手套手卫生.mp4",
-//        "VERTICAL_SCREEN_FLAG": false,                  //是否采用竖屏模式
         "TOUCHSCREEN_ENABLE": true,                  // 是否支持触屏
         "SUMMARY_ENABLE": true,                         // 是否展示总结报告
         "SUMMARY_PATH": "./summary",                   // 总结报告保存路径

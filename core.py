@@ -244,7 +244,7 @@ def worker_auto(input_q, output_q, stop_event, skip_event, back_event):
                     model.update_next() # jiarun: 先更新next_model，next_model检测下一个动作
                     switch_flag = True
 
-        output_q.put({'update': d_update_flag, 'finish': d_finish_flag, 'reset': d_reset_flag, 'hm': hm})
+        output_q.put({'update': d_update_flag, 'finish': d_finish_flag, 'reset': d_reset_flag, 'hm': hm, 'pred':predict})
         if end_flag:
             # 倒计时结束
             end_timer -= 1
@@ -280,7 +280,7 @@ def update_drawer(drawer, info):
     if info['reset']:
         drawer.reset_detect()
     if info['hm'] is not None:
-        drawer.update_heatmap(info['hm'])
+        drawer.update_heatmap(info)
 
 
 def gui_main(input_q, output_q, stop_event, skip_event, back_event, cap):
