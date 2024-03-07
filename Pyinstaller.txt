@@ -1,0 +1,14 @@
+1. pyinstaller -D main.py 
+2. 查看生成的dist目录, main文件就是打包好的项目文件
+3. 将需要的资源移动到main目录，包括：
+	1. examples文件夹
+	2. fonts文件夹
+	3. hints文件夹
+	4. music文件夹
+	5. music文件夹
+	6. style文件夹
+	7. tsm_weight文件夹
+	8. setting.json5
+	9. ffmpeg.exe
+	10. license文件夹(这个版本不要了)
+	11. resnet18_weight(这个版本不要了) 

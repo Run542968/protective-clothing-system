@@ -1,0 +1,39 @@
+[
+  {
+    "COMMENTS": "以下为 新版本&横屏 的样式配置",
+    "SCENARIO": 1,
+    "REC_FONT_SIZE": 38,
+    "LST_FONT_SIZE": 35,
+    "ITEM_SPACING_SIZE": 50,
+    "HINTS_FONT_SIZE": 40,
+    "HINTS_LINE_SPACING": 1.5
+  },
+
+  {
+    "SCENARIO": 2,
+    "REC_FONT_SIZE": 35,
+    "LST_FONT_SIZE": 35,
+    "ITEM_SPACING_SIZE": 100,
+    "HINTS_FONT_SIZE": 40,
+    "HINTS_LINE_SPACING": 1.5,
+
+    "COMMENTS": "横屏显示第三步时需加上换行符，竖屏不需要",
+    "STEPS": [
+            "01 外层手套手卫生",
+            "02 脱遮面板",
+            "03 外层手套手卫生",
+            "04 脱防护服及手套",
+            "05 内层手套手卫生",
+            "结束"
+        ]
+  },
+
+  {
+    "SCENARIO": 3,
+    "REC_FONT_SIZE": 38,
+    "LST_FONT_SIZE": 35,
+    "ITEM_SPACING_SIZE": 70,
+    "HINTS_FONT_SIZE": 40,
+    "HINTS_LINE_SPACING": 1.5
+  }
+]
