@@ -7,8 +7,6 @@ from drawer import Drawer
 from drawer_vertical import DrawerVertical
 from conf import conf
 import time
-# import win32com.client
-# from win32com.client import constants
 import winsound
 from video_recorder import VideoWriter
 from speaker import Speaker

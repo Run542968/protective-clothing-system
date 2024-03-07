@@ -5,10 +5,7 @@
 	2. fonts文件夹
 	3. hints文件夹
 	4. music文件夹
-	5. music文件夹
-	6. style文件夹
-	7. tsm_weight文件夹
-	8. setting.json5
-	9. ffmpeg.exe
-	10. license文件夹(这个版本不要了)
-	11. resnet18_weight(这个版本不要了) 
+	5. style文件夹
+	6. tsm_weight文件夹
+	7. setting.json5
+	8. ffmpeg.exe

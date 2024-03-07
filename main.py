@@ -2,8 +2,7 @@ import os
 import time
 import datetime
 
-# import win32com.client
-# from win32com.client import constants
+
 from comtypes.client import CreateObject, Constants
 import cv2
 import numpy as np
@@ -14,8 +13,6 @@ from queue import Queue
 from core import worker_manual, worker_auto, gui_main
 from conf import conf, load_setting
 from utils import set_window
-from user_auth import auth_check, gen_application_code
-import tkinter as tk
 import tkinter.ttk as ttk
 import pyperclip
 from draw_statistic import Draw_Statistic
@@ -445,10 +442,6 @@ if __name__ == '__main__':
     conf.FRAME_HEIGHT = 1280
     conf.FRAME_WIDTH = 720
 
-    # if conf.MICROPHONE_ENABLE:  # jiarun-NOTE: disabled
-    #     import recognizer2
-    #
-    #     recognizer2.set_energy_thres(conf.ENERGY_THRES)
 
     Cap = openCap()     # 摄像头
     if Cap != None: # jiarun: 摄像头用对了才进入下一步

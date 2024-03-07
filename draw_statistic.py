@@ -1,19 +1,6 @@
-# from pyecharts import options as opts
-# from pyecharts.charts import Pie
-
-#
-# c = (
-#     Pie()
-#     .add("", [['跳水', 12], ['射击', 11], ['举重', 8], ['竞技体操', 8], ['乒乓球', 7], ['游泳', 6], ['羽毛球', 6], ['田径', 5], ['静水皮划艇', 3], ['蹦床体操', 3], ['自由式摔跤', 3], ['赛艇', 3], ['空手道', 2], ['拳击', 2], ['帆船', 2], ['花样游泳', 2], ['跆拳道', 1], ['场地自行车赛', 1], ['古典式摔跤', 1], ['击剑', 1], ['三人篮球', 1]],
-#          center=["50%", "60%"],)
-#     .set_series_opts(label_opts=opts.LabelOpts(formatter="{b}: {c}"))
-# )
-# c.render("评价数分布-柱形图.html")
 
 from conf import conf  # 全局conf
 import numpy as np
-# import matplotlib
-# matplotlib.use('Agg')
 import matplotlib.pyplot as plt
 plt.switch_backend('agg')
 import matplotlib as mpl

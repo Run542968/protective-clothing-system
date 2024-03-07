@@ -5,10 +5,8 @@ from conf import conf, load_setting
 import os
 from utils import set_window, Cropper
 from draw_utils import ImageText, _rect_with_rounded_corners, action_lst, rectangle_text, draw_light
-import time
 from video_recorder import VideoWriter
 from tracer import ParallelTracer
-import pdb
 from video_reader import ThreadCapture
 
 

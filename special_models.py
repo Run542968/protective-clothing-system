@@ -326,13 +326,14 @@ class C1GPU_TsmResnet50:
                 prob = torch.softmax(logit, dim=0) # jiarun: [num_classes]
                 score = float(torch.max(prob)) # jiarun: [1]
 
-                if score < conf.HW_MODEL_POSITIVE_THRES:
+                if score < conf.HW_MODEL_POSITIVE_THRES :
                     predict = 0
                     heatmap = np.zeros((h, w)).astype(np.uint8)
                 else:
-                    predict = torch.argmax(prob) + 1
-                    heatmap = self.get_heatmap(feat.cpu(), h, w)
+                    predict = int(torch.argmax(prob) + 1)
+                    heatmap = self.get_heatmap(feat.cpu(), h, w, predict-1)
                 # heatmap = int(predict)
+
                 heatmap = cropper.putback(heatmap, idx)
 
             else:
@@ -340,7 +341,7 @@ class C1GPU_TsmResnet50:
 
         return {'score': score, 'pred': predict, 'hm': heatmap}
 
-    def get_heatmap(self, feature_map, h, w):
+    def get_heatmap(self, feature_map, h, w, class_id=None):
         feat = feature_map # jiarun: [1,2048,7,7]
 
         # score.backward()
@@ -348,9 +349,11 @@ class C1GPU_TsmResnet50:
         # grad = F.adaptive_avg_pool2d(grad, (1, 1)).squeeze(0)
         feat = feat.squeeze(0) # jiarun: [2028,7,7]
         # feat = feat * grad
-        weight = self.model.fc.weight.unsqueeze(0).mean(1,keepdim=True) # jiarun add this line for adapting to handwash: [1,1,2048]
+        if class_id==None:
+            weight = self.model.fc.weight.unsqueeze(0).mean(1,keepdim=True) # jiarun add this line for adapting to handwash: [1,1,2048]
+        else:
+            weight = self.model.fc.weight[class_id,:].reshape(1,1,-1) # jiarun: [1,1,2048]
         feat = feat * weight.permute(2, 0, 1).cpu() # fc.weight=[num_classes,2048]->[1,num_classes,2048]->[2048,1,num_classes]
-
         heatmap = feat.detach().numpy() # [2048,7,7]
         heatmap = np.mean(heatmap, axis=0) # [7,7]
 

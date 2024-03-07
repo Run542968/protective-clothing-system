@@ -1,7 +1,7 @@
 [
     {
         "USE_GPU": false,                                //是否使用GPU
-        "FROM_CAMERA_FLAG":false,                        //是否从摄像头输入，否则从文件输入
+        "FROM_CAMERA_FLAG":true,                        //是否从摄像头输入，否则从文件输入
         //若从摄像头输入，摄像头ID
         "CAMERA_ID": 1,                                 //摄像头id
         //若从文件输入，文件的路径
