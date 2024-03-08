@@ -77,16 +77,12 @@ class Cropper:
                 self.paras[1] = (0, 0, conf.FRAME_HEIGHT // 3, conf.FRAME_WIDTH)  # 脱护目镜
                 #self.paras[1] = (0, 0, conf.FRAME_HEIGHT, conf.FRAME_WIDTH)  # 脱护目镜
                 self.paras[2] = (0, 0, conf.FRAME_HEIGHT // 2, conf.FRAME_WIDTH)  # 外层手套手卫生
-                # tsm的内层手卫生、脱内层手套不做crop
-                if conf.MODEL_COMPLEXITY == 0:
-                    self.paras[4] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)   # 内层手套手卫生
+                self.paras[4] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)   # 内层手套手卫生
                 # load_setting(2)
             else:
                 self.paras[0] = (conf.FRAME_HEIGHT // 2, 0, conf.FRAME_HEIGHT // 2, conf.FRAME_WIDTH)  # 脱内鞋套
-                # tsm的内层手卫生、脱内层手套不做crop
-                if conf.MODEL_COMPLEXITY == 0:
-                    self.paras[1] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 内层手套手卫生
-                    self.paras[2] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 脱内层手套
+                self.paras[1] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 内层手套手卫生
+                self.paras[2] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 脱内层手套
                 self.paras[3] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 手卫生
                 self.paras[4] = (0, 0, conf.FRAME_HEIGHT // 3, conf.FRAME_WIDTH)  # 脱帽子
                 # self.paras[5] = (0, 0, conf.FRAME_HEIGHT // 3, conf.FRAME_WIDTH)  # 脱口罩
@@ -132,15 +128,34 @@ class Cropper:
                 self.paras[11] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 手卫生
 
     def crop(self, img, idx):
+        # jiarun: tsm的内层手卫生、脱内层手套不做crop，因为训练的时候没有这样训练
+        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==2 and idx==4:
+            return img
+        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==3 and idx in [1, 2]:
+            return img
+
         if idx in self.paras.keys():
             top, left, h, w = self.paras[idx]
             img = tF.crop(img, top, left, h, w)
+
         return img
 
     def get_crop_pos(self, idx):
         return self.paras[idx]
 
     def putback(self, cv2img, idx):
+        # jiarun: tsm的内层手卫生、脱内层手套不做crop，因为训练的时候没有这样训练
+        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==2 and idx==4:
+            img = np.zeros((conf.FRAME_HEIGHT, conf.FRAME_WIDTH)).astype(np.uint8)
+            top, left, h, w = self.paras[idx]
+            img[top: top+h, left: left+w] = cv2img[top: top+h, left:left+w]
+            return img
+        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==3 and idx in [1, 2]:
+            img = np.zeros((conf.FRAME_HEIGHT, conf.FRAME_WIDTH)).astype(np.uint8)
+            top, left, h, w = self.paras[idx]
+            img[top: top + h, left: left + w] = cv2img[top: top + h, left:left + w]
+            return img
+        
         # 把crop出来的部分放回原图上的位置
         if idx in self.paras.keys():
             img = np.zeros((conf.FRAME_HEIGHT, conf.FRAME_WIDTH)).astype(np.uint8)

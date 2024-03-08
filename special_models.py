@@ -307,6 +307,9 @@ class C1GPU_TsmResnet50:
 
     def forward(self, cv2img, cropper, idx):
         img = Image.fromarray(cv2.cvtColor(cv2img, cv2.COLOR_BGR2RGB))
+        # if idx==4:
+        #     import pdb
+        #     pdb.set_trace()
         img = cropper.crop(img, idx)
         b_img = self.transform(img).unsqueeze(0).to(self.device)            # add batch axis
         with torch.no_grad():

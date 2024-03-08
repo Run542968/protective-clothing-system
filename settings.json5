@@ -1,12 +1,12 @@
 [
     {
         "USE_GPU": false,                                //是否使用GPU
-        "FROM_CAMERA_FLAG":true,                        //是否从摄像头输入，否则从文件输入
+        "FROM_CAMERA_FLAG":false,                        //是否从摄像头输入，否则从文件输入
         //若从摄像头输入，摄像头ID
         "CAMERA_ID": 1,                                 //摄像头id
         //若从文件输入，文件的路径
         "VIDEO_DIR": "examples/",
-        "VIDEO_NAME": "内层手套手卫生.mp4",
+        "VIDEO_NAME": "杜.mp4",
         "TOUCHSCREEN_ENABLE": true,                  // 是否支持触屏
         "SUMMARY_ENABLE": true,                         // 是否展示总结报告
         "SUMMARY_PATH": "./summary",                   // 总结报告保存路径

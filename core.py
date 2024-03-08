@@ -321,7 +321,7 @@ def gui_main(input_q, output_q, stop_event, skip_event, back_event, cap):
             frame = frame[top: top + crop_h, left: left + crop_w]
         else:
             # 文件输入流裁剪
-            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE) # jiarun: 本来是W,H，旋转后变成H,W
+            # frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE) # jiarun: 本来是W,H，旋转后变成H,W
             frame = cv2.flip(frame, 1)
             scale = conf.CAP_HEIGHT // 16
             crop_h, crop_w = scale * 16, scale * 9 # jiarun: 16:9的比例，是一种中心裁剪
