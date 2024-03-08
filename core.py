@@ -312,7 +312,8 @@ def gui_main(input_q, output_q, stop_event, skip_event, back_event, cap):
 
         if conf.FROM_CAMERA_FLAG:
             # 摄像头裁剪+旋转
-            frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE) # jiarun: 旋转保证输入的摄像头的广角，这样能拍全人体
+            if conf.CAMERA_ROTATE:
+                frame = cv2.rotate(frame, cv2.ROTATE_90_COUNTERCLOCKWISE) # jiarun: 旋转保证输入的摄像头的广角，这样能拍全人体
             frame = cv2.flip(frame, 1) # jiarun: 翻转克服镜像
             scale = conf.CAP_HEIGHT // 16 # jiarun-NOTE: 手动设置CAP_HEIGHT的目的是，如果frame大于这个高度，就按照这个高度中心裁剪，如果小于这个分辨率，就按照摄像头的分辨率。不过还是根据摄像头自动捕捉比较合理，不用手动设置，手动设置会因为摄像头的协议而失效，罗技摄像头的分辨率就改不了
             crop_h, crop_w = scale * 16, scale * 9 # jiarun: 把摄像头输入的画面安装16:9给裁剪一下

@@ -17,4 +17,6 @@ output/*
 test_videos/*
 sotre/*
 storage/*
+dist/*
+build/*
 

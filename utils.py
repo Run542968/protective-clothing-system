@@ -66,17 +66,19 @@ class Cropper:
                 self.paras[2] = (0, 0, conf.FRAME_HEIGHT // 3, conf.FRAME_WIDTH)  # 戴口罩
                 self.paras[3] = (0, 0, conf.FRAME_HEIGHT // 3, conf.FRAME_WIDTH)  # 检查口罩气密性
                 self.paras[4] = (conf.FRAME_HEIGHT // 2, 0, conf.FRAME_HEIGHT // 2, conf.FRAME_WIDTH)  # 穿内层鞋套
-                self.paras[5] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 戴内层手套
-                self.paras[6] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 检查手套气密性
+                self.paras[5] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 检查手套气密性
+                self.paras[6] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)  # 戴内层手套
+                self.paras[7] = (conf.FRAME_HEIGHT // 20, conf.FRAME_WIDTH //16, conf.FRAME_HEIGHT // 20 * 18, conf.FRAME_WIDTH // 16 * 14)  # 穿防护服
                 self.paras[8] = (0, 0, conf.FRAME_HEIGHT // 3, conf.FRAME_WIDTH)  # 戴护目镜
                 self.paras[9] = (0, 0, conf.FRAME_HEIGHT // 2, conf.FRAME_WIDTH)  # 戴外层手套
+                self.paras[10] = (conf.FRAME_HEIGHT // 20, conf.FRAME_WIDTH //16, conf.FRAME_HEIGHT // 20 * 18, conf.FRAME_WIDTH // 16 * 14)  # 检查穿戴完整性
 
                 # load_setting(1)
             elif conf.SCENARIO == 2:
                 self.paras[0] = (0, 0, conf.FRAME_HEIGHT // 2, conf.FRAME_WIDTH)  # 外层手套手卫生
                 self.paras[1] = (0, 0, conf.FRAME_HEIGHT // 3, conf.FRAME_WIDTH)  # 脱护目镜
-                #self.paras[1] = (0, 0, conf.FRAME_HEIGHT, conf.FRAME_WIDTH)  # 脱护目镜
                 self.paras[2] = (0, 0, conf.FRAME_HEIGHT // 2, conf.FRAME_WIDTH)  # 外层手套手卫生
+                self.paras[3] = (conf.FRAME_HEIGHT // 20, conf.FRAME_WIDTH //16, conf.FRAME_HEIGHT // 20 * 18, conf.FRAME_WIDTH // 16 * 14)  # 脱防护服及手套
                 self.paras[4] = (conf.FRAME_HEIGHT // 4, 0, conf.FRAME_HEIGHT // 4, conf.FRAME_WIDTH)   # 内层手套手卫生
                 # load_setting(2)
             else:
@@ -129,9 +131,9 @@ class Cropper:
 
     def crop(self, img, idx):
         # jiarun: tsm的内层手卫生、脱内层手套不做crop，因为训练的时候没有这样训练
-        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==2 and idx==4:
+        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==2 and idx in [4,7,10]:
             return img
-        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==3 and idx in [1, 2]:
+        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==3 and idx in [1, 2, 3]:
             return img
 
         if idx in self.paras.keys():
@@ -145,17 +147,17 @@ class Cropper:
 
     def putback(self, cv2img, idx):
         # jiarun: tsm的内层手卫生、脱内层手套不做crop，因为训练的时候没有这样训练
-        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==2 and idx==4:
+        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==2 and idx==idx in [4,7,10]:
             img = np.zeros((conf.FRAME_HEIGHT, conf.FRAME_WIDTH)).astype(np.uint8)
             top, left, h, w = self.paras[idx]
             img[top: top+h, left: left+w] = cv2img[top: top+h, left:left+w]
             return img
-        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==3 and idx in [1, 2]:
+        if conf.MODEL_COMPLEXITY != 0 and conf.SCENARIO==3 and idx in [1, 2, 3]:
             img = np.zeros((conf.FRAME_HEIGHT, conf.FRAME_WIDTH)).astype(np.uint8)
             top, left, h, w = self.paras[idx]
             img[top: top + h, left: left + w] = cv2img[top: top + h, left:left + w]
             return img
-        
+
         # 把crop出来的部分放回原图上的位置
         if idx in self.paras.keys():
             img = np.zeros((conf.FRAME_HEIGHT, conf.FRAME_WIDTH)).astype(np.uint8)
